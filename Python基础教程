@@ -1,0 +1,46 @@
+# 给知了写的Python基础教程,这是源码。
+
+import requests
+from bs4 import BeautifulSoup
+import re
+
+url = 'http://movie.mtime.com/207927/posters_and_images/'
+r = requests.get(url)
+bs = BeautifulSoup(r.text,"lxml")
+
+# 得到所有选项卡的网页链接
+def get_nav(bs):
+    nav = bs.find('ul',{'id':'imageNavUl'})
+    return [[item.find('a')['href'],item.a.text] for item in nav.find_all('li')]
+
+# 得到所有图片的链接
+def get_pic(url):
+    pic_r = requests.get(url).text
+    p = re.compile(r'http://img5.*?\.jpg')
+    return p.findall(pic_r)
+
+# 图片链接去重
+def pic_set():
+    pic_src_set = set()
+    nav_list = get_nav(bs)
+    for nav in nav_list:
+        pic_list = get_pic(nav[0])[:5] # 这里演示只下载5张图片
+        for src in pic_list:
+            pic_src_set.add(src)
+    return pic_src_set
+
+# 将图片下载到文件夹内
+count = 0
+def download_pic(src):
+    global count
+    count += 1
+    moviename = '木乃伊'
+    pic_name = moviename + str(count) + '.jpg'
+    with open(pic_name, 'wb') as f:
+        f.write(requests.get(src).content)
+
+# 执行上述程序
+if __name__ == '__main__':
+    pic_set = pic_set()
+    for src in pic_set:
+        download_pic(src)
