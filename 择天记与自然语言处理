@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+# -*- coding:utf-8 -*-
+# @Time    : 2017/6/16 13:57
+# @Author  : Allen Wang
+# @Creed   : stay curious,stay elegant.
+# @Blog    : http://www.wyxwhy.com/
+
+from gensim import models
+from matplotlib.font_manager import FontProperties
+import jieba
+import numpy as np
+from sklearn.cluster import KMeans
+import scipy.cluster.hierarchy as sch
+from matplotlib import pyplot as plt
+font_yahei_consolas = FontProperties(fname="C:/Windows/Fonts/simhei.ttf")
+
+# 读取择天记小说
+with open('64565.txt',encoding='utf-8') as f:
+    cont = [line.strip() for line in f.readlines() if line.strip()]
+
+# 读取人物名字
+with open('names.txt') as f:
+    names = [name.strip() for name in f.readlines()]
+
+# 读取门派、境界、招式等名词
+with open('novelitems.txt') as f:
+    items = [item.strip() for item in f.readlines()]
+
+# 小说字符串
+
+def find_main_charecters(num = 10):
+    novel = ''.join(cont)
+    count = []
+    for name in names:
+        count.append([name,novel.count(name)])
+    count.sort(key = lambda v : v[1],reverse=True)
+    return count[:num]
+
+model = models.Word2Vec.load("zetianjied.model")
+
+all_names = []
+word_vectors = None
+
+for name in names:
+    if name in model:
+        all_names.append(name)
+        if word_vectors is None:
+            word_vectors = model[name]
+        else:
+            word_vectors = np.vstack((word_vectors,model[name]))
+
+all_names = np.array(all_names)
+
+Y = sch.linkage(word_vectors, method="ward")
+
+_, ax = plt.subplots(figsize=(10, 40))
+
+Z = sch.dendrogram(Y, orientation='right')
+idx = Z['leaves']
+
+ax.set_xticks([])
+ax.set_yticklabels(all_names[idx], fontproperties=font_yahei_consolas)
+ax.set_frame_on(False)
+
+plt.show()
