@@ -9,3 +9,5 @@ author = 'AlenWang'
 `Practice 01` 抓取豆瓣任意标签下的全部图书
 
 `Practice 02` 抓取起点中文网任意关键下的全部图书的关键信息
+
+`Practice 03` 用Python分析网络小说《择天记》
