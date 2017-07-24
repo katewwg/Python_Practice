@@ -11,3 +11,5 @@ author = 'AlenWang'
 `Practice 02` 抓取起点中文网任意关键下的全部图书的关键信息
 
 `Practice 03` 用Python分析网络小说《择天记》
+
+`Practice 04` 泰坦尼克号数据集机器学习与数据挖掘
